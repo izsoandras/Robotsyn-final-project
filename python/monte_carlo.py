@@ -44,6 +44,7 @@ def run():
     for cov, query in zip(covs, queries):
         print('-----------------------')
         print(f'Covariance for {query}:')
+        print(f'Order: yaw [rad], pitch [rad], roll [rad], x [m], y [m], z [m]')
         print(cov)
 
 if __name__ == "__main__":
