@@ -61,6 +61,7 @@ def draw_point_cloud(X, I1, uv1, xlim, ylim, zlim):
     ax.set_ylabel('Z')
     ax.set_zlabel('Y')
     plt.title('[Click, hold and drag with the mouse to rotate the view]')
+    return ax
 
 def hline(l, **args):
     """

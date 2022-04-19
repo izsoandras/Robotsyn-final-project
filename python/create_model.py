@@ -8,6 +8,7 @@ from F_from_E import F_from_E
 from figures import *
 from triangulate_many import *
 from decompose_E import *
+from draw_point_cloud import draw_frame
 
 
 def run(img_name1='IMG_8224.jpg', img_name2='IMG_8228.jpg'):
@@ -31,7 +32,7 @@ def run(img_name1='IMG_8224.jpg', img_name2='IMG_8228.jpg'):
 
     # NB! You will want to experiment with different options for the ratio test and
     # "unique" (cross-check).
-    index_pairs, match_metric = match_features(des1, des2, max_ratio=0.9, unique=False)
+    index_pairs, match_metric = match_features(des1, des2, max_ratio=0.8, unique=False)
     print('Found %d matches' % index_pairs.shape[0])
 
     kp1 = np.array([kp.pt for kp in kp1])
@@ -47,7 +48,7 @@ def run(img_name1='IMG_8224.jpg', img_name2='IMG_8228.jpg'):
 
     xy1 = np.linalg.inv(K) @ uv1
     xy2 = np.linalg.inv(K) @ uv2
-    E, errors, inliers_mask = estimate_E_ransac(xy1, xy2, K, 4, 2000)
+    E, errors, inliers_mask = estimate_E_ransac(xy1, xy2, K, 2, 4000)
 
     Ts = decompose_E(E)
 
@@ -69,6 +70,7 @@ def run(img_name1='IMG_8224.jpg', img_name2='IMG_8228.jpg'):
     np.savetxt('./points.txt', X)
     np.savetxt('./des1.txt', des1_inl)
     np.savetxt('./des2.txt', des2_inl)
+    np.savetxt('./colors.txt', img1_color[xy1[0, inliers_mask].astype(np.int32),xy1[1, inliers_mask].astype(np.int32)])
 
     # Plot the 50 best matches in two ways befure RANSAC
     best_index_pairs = index_pairs[np.argsort(match_metric)[:50]]
@@ -85,7 +87,9 @@ def run(img_name1='IMG_8224.jpg', img_name2='IMG_8228.jpg'):
 
     plt.figure()
     print(uv1[:, inliers_mask].shape)
-    draw_point_cloud(X, img1_color, uv1[:, inliers_mask], xlim=[-1, +1], ylim=[-1, +1], zlim=[1, 3])
+    ax = draw_point_cloud(X, img1_color, uv1[:, inliers_mask], xlim=[-1, +1], ylim=[-1, +1], zlim=[1, 3])
+    draw_frame(ax, np.eye(4), 0.2)
+    draw_frame(ax, np.linalg.inv(T), 0.2)
     plt.show()
 
 
